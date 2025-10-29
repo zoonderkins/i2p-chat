@@ -149,5 +149,19 @@
     <file>icons/underline.svg</file>
     <file>icons/upload.svg</file>
     <file>icons/web.svg</file>
+    <file>../../qss/Default.qss</file>
+    <file>../../qss/black.qss</file>
+    <file>../../qss/blacknight.qss</file>
+    <file>../../qss/blue.qss</file>
+    <file>../../qss/darkle.qss</file>
+    <file>../../qss/noskin.qss</file>
+    <file>../../qss/orangesurfer.qss</file>
+    <file>../../qss/qlive.qss</file>
+    <file>../../qss/redscorpion.qss</file>
+    <file>../../qss/silver.qss</file>
+    <file>../../qss/silvergrey.qss</file>
+    <file>../../qss/uus.qss</file>
+    <file>../../qss/yaba.qss</file>
+    <file>../../qss/yeah.qss</file>
   </qresource>
 </RCC>

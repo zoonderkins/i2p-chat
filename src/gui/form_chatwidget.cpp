@@ -132,6 +132,9 @@ form_ChatWidget::form_ChatWidget(CUser &user, CCore &Core,
   message->setCurrentFont(mCurrentFont);
   message->setFont(mCurrentFont);
 
+  // Set cursor width to make it more visible
+  message->setCursorWidth(2);
+
   txtBold->setChecked(mCurrentFont.bold());
   txtItalic->setChecked(mCurrentFont.italic());
   txtUnder->setChecked(mCurrentFont.underline());

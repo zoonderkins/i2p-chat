@@ -71,6 +71,10 @@ int main(int argc, char *argv[]) {
   // Qt 6: High-DPI scaling is always enabled, no need to set attribute
 
   QApplication app(argc, argv);
+
+  // Initialize Qt resources
+  Q_INIT_RESOURCE(resourcen);
+
   QString configPath;
   QFile styleSheetFile(":qss/Default.qss");
 
@@ -199,8 +203,18 @@ int main(int argc, char *argv[]) {
   }
 
   mainForm->show();
-  styleSheetFile.open(QFile::ReadOnly);
-  app.setStyleSheet(styleSheetFile.readAll());
+
+  // Try to load stylesheet
+  if (styleSheetFile.open(QFile::ReadOnly)) {
+    QString styleSheet = styleSheetFile.readAll();
+    app.setStyleSheet(styleSheet);
+    styleSheetFile.close();
+    qDebug() << "Stylesheet loaded successfully:" << styleSheetFile.fileName();
+  } else {
+    qDebug() << "Warning: Could not open stylesheet:" << styleSheetFile.fileName();
+    qDebug() << "Error:" << styleSheetFile.errorString();
+  }
+
   app.exec();
   app.closeAllWindows();
 

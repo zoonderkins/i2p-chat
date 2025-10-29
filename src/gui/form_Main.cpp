@@ -53,6 +53,9 @@ form_MainWindow::form_MainWindow(QString configDir, QWidget *parent)
   connect(Core, SIGNAL(signNicknameChanged()), this,
           SLOT(eventNicknameChanged()));
 
+  connect(btnShowDestination, SIGNAL(clicked()), this,
+          SLOT(showMyDestination()));
+
   mUserSearchWindow = NULL;
   mTopicSubscribeWindow = NULL;
   mAboutWindow = NULL;
@@ -237,14 +240,50 @@ void form_MainWindow::namingMe() {
 void form_MainWindow::closeApplication() {
   if (Core->getFileTransferManager()->checkActiveFileTransfer() == false) {
 
+    // Show Destination info before exit
+    QString myDestB32 = Core->getMyDestinationB32();
+    QString myDestFull = Core->getMyDestination();
+
+    // Check SAM and SOCKS5 connection status
+    bool samConnected = false;
+    bool socks5Enabled = false;
+    QString samHost, socks5Host;
+    int samPort, socks5Port;
+
+    checkSamConnectionStatus(samConnected, samHost, samPort);
+    checkSocks5Status(socks5Enabled, socks5Host, socks5Port);
+
+    QString infoText = tr("\nYour I2P Information:\n\n");
+
+    // Only show status page if SAM or SOCKS5 is connected
+    if ((samConnected || socks5Enabled) && !myDestB32.isEmpty()) {
+      infoText += tr("Status Page:\nhttp://") + myDestB32 + "\n\n";
+    }
+
+    if (!myDestFull.isEmpty()) {
+      infoText += tr("Full Destination:\n") + myDestFull + "\n\n";
+    } else {
+      infoText += tr("(Destination not available - not connected)\n\n");
+    }
+
+    infoText += tr("Do you want to quit I2PChat?");
+
     QMessageBox *msgBox = new QMessageBox(this);
     QPixmap pixmap = QPixmap(":/icons/avatar.svg");
     msgBox->setWindowIcon(QIcon(pixmap));
     msgBox->setIcon(QMessageBox::Question);
-    msgBox->setText(tr("\nAre you sure you wish to quit?"));
+    msgBox->setInformativeText(infoText);
     msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox->setDefaultButton(QMessageBox::Yes);
     msgBox->setWindowModality(Qt::WindowModal);
+
+    // Make the message box larger, enable text selection and word wrap
+    msgBox->setStyleSheet("QMessageBox { min-width: 600px; } "
+                         "QLabel { min-width: 580px; min-height: 200px; text-align: left; }");
+
+    // Enable text selection
+    msgBox->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+
     int ret = msgBox->exec();
     if (ret == QMessageBox::No) {
       return;
@@ -453,8 +492,10 @@ void form_MainWindow::connecttreeWidgetCostumPopupMenu(QPoint point) {
   QMenu contextMnu(this);
   QMenu contextMnuPos("Position", this);
 
+  // Use the new Qt 6 constructor: QMouseEvent(type, localPos, globalPos, button, buttons, modifiers)
+  QPointF globalPoint = mapToGlobal(point);
   QMouseEvent *mevent =
-      new QMouseEvent(QEvent::MouseButtonPress, point, Qt::RightButton,
+      new QMouseEvent(QEvent::MouseButtonPress, point, globalPoint, Qt::RightButton,
                       Qt::RightButton, Qt::NoModifier);
 
   QAction *UserChat = new QAction(QIcon(ICON_CHAT), tr("Chat"), this);
@@ -546,7 +587,7 @@ void form_MainWindow::connecttreeWidgetCostumPopupMenu(QPoint point) {
     contextMnu.addMenu(&contextMnuPos);
     // TODO: Fix width of context menu and ensure sub-menu overlaps
     // contextMnu.setMaximumWidth(170);
-    contextMnu.exec(mevent->globalPos());
+    contextMnu.exec(mevent->globalPosition().toPoint());
   }
 }
 
@@ -876,6 +917,55 @@ void form_MainWindow::showUserInfos() {
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Ok);
   msgBox.setWindowModality(Qt::NonModal);
+  msgBox.exec();
+}
+
+void form_MainWindow::showMyDestination() {
+  QString myDestB32 = Core->getMyDestinationB32();
+  QString myDestFull = Core->getMyDestination();
+
+  // Check SAM and SOCKS5 connection status
+  bool samConnected = false;
+  bool socks5Enabled = false;
+  QString samHost, socks5Host;
+  int samPort, socks5Port;
+
+  checkSamConnectionStatus(samConnected, samHost, samPort);
+  checkSocks5Status(socks5Enabled, socks5Host, socks5Port);
+
+  QString infoText = tr("Your I2P Information:\n\n");
+
+  // Only show status page if SAM or SOCKS5 is connected
+  if ((samConnected || socks5Enabled) && !myDestB32.isEmpty()) {
+    infoText += tr("Status Page:\nhttp://") + myDestB32 + "\n\n";
+  }
+
+  if (!myDestFull.isEmpty()) {
+    infoText += tr("Full Destination:\n") + myDestFull;
+  } else {
+    infoText += tr("Full Destination:\n(Not connected to I2P)");
+  }
+
+  QMessageBox msgBox(this);
+  QPixmap pixmap = QPixmap(":/icons/avatar.svg");
+  msgBox.setWindowIcon(QIcon(pixmap));
+  msgBox.setIcon(QMessageBox::Information);
+  msgBox.setWindowTitle(tr("My I2P Destination"));
+
+  // Use setInformativeText for better formatting and scrolling
+  msgBox.setInformativeText(infoText);
+
+  msgBox.setStandardButtons(QMessageBox::Ok);
+  msgBox.setDefaultButton(QMessageBox::Ok);
+  msgBox.setWindowModality(Qt::NonModal);
+
+  // Make the message box larger, enable text selection and word wrap
+  msgBox.setStyleSheet("QMessageBox { min-width: 600px; } "
+                       "QLabel { min-width: 580px; min-height: 150px; text-align: left; }");
+
+  // Enable text selection
+  msgBox.setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+
   msgBox.exec();
 }
 

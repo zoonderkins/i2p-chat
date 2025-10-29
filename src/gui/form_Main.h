@@ -106,6 +106,7 @@ private slots:
   void eventUserChanged();
   void muteSound();
   void showUserInfos();
+  void showMyDestination();
   void UserPositionUP();
   void UserPositionDOWN();
   void UserInvisible(bool b);

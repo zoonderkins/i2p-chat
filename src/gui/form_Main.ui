@@ -135,39 +135,79 @@ QListView{padding:1px;}</string>
      </widget>
     </item>
     <item row="3" column="0">
-     <widget class="QLabel" name="statusLabel">
-      <property name="minimumSize">
-       <size>
-        <width>269</width>
-        <height>24</height>
-       </size>
+     <layout class="QHBoxLayout" name="statusBarLayout">
+      <property name="spacing">
+       <number>0</number>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>269</width>
-        <height>24</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QLabel {
+      <item>
+       <widget class="QPushButton" name="btnShowDestination">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Show My Destination</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  background: #f0f0f0;
+  border: none;
+  border-top: 1px solid #ccc;
+  padding: 2px;
+}
+QPushButton:hover {
+  background: #e0e0e0;
+}</string>
+        </property>
+        <property name="text">
+         <string>ℹ️</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="minimumSize">
+         <size>
+          <width>245</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>245</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel {
   background: #f0f0f0;
   border-top: 1px solid #ccc;
   padding: 2px 4px;
   color: #666;
 }</string>
-      </property>
-      <property name="text">
-       <string>SOCKS5: - | SAM: -</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignVCenter</set>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>SOCKS5: - | SAM: -</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item row="1" column="0" alignment="Qt::AlignVCenter">
      <widget class="QFrame" name="frame">
