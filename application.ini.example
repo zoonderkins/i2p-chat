@@ -1,0 +1,59 @@
+# I2PChat Configuration Example
+# This file should be placed at ~/.i2pchat/application.ini
+
+[General]
+# Enable debug logging (logs to ~/.i2pchat/DebugLog.txt)
+DebugLogging=true
+
+# Qt style (Fusion, Windows, macOS)
+current_Style=Fusion
+
+[Network]
+# SAM Bridge connection settings
+SAMHost=127.0.0.1
+SAMPort=7656
+
+# Signature type for new I2P destinations
+# Options: EdDSA_SHA512_Ed25519 (recommended), ECDSA_SHA256_P256, ECDSA_SHA384_P384, ECDSA_SHA512_P521
+Signature_Type=EdDSA_SHA512_Ed25519
+
+# SOCKS5 Proxy Settings
+# Set to true to connect to SAM bridge through a SOCKS5 proxy
+SOCKS5ProxyEnabled=false
+
+# SOCKS5 proxy host (IP or hostname)
+SOCKS5ProxyHost=
+
+# SOCKS5 proxy port (default: 1080)
+SOCKS5ProxyPort=1080
+
+# SOCKS5 proxy authentication (optional)
+SOCKS5ProxyUsername=
+SOCKS5ProxyPassword=
+
+[Style]
+# Custom QSS stylesheet path (optional)
+CustomStyleSheet=
+
+# Examples for different connection scenarios:
+
+# Example 1: Direct SAM connection (default, no proxy)
+# SOCKS5ProxyEnabled=false
+# SAMHost=127.0.0.1
+# SAMPort=7656
+
+# Example 2: Remote i2pd via SOCKS5 proxy
+# SOCKS5ProxyEnabled=true
+# SOCKS5ProxyHost=192.168.1.100
+# SOCKS5ProxyPort=4444
+# SAMHost=127.0.0.1
+# SAMPort=7656
+
+# Example 3: i2pd via SSH tunnel (SOCKS5)
+# SOCKS5ProxyEnabled=true
+# SOCKS5ProxyHost=127.0.0.1
+# SOCKS5ProxyPort=1080
+# SOCKS5ProxyUsername=
+# SOCKS5ProxyPassword=
+# SAMHost=127.0.0.1
+# SAMPort=7656
