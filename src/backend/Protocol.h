@@ -99,8 +99,8 @@ const QString HTTPPAGE =
     "<h3>You have reached the I2PChat Destination for [USERNAME]</h3><div "
     "id=\"dest\">[MYDEST]</div><div "
     "id=\"moreinfo\">More information: <a "
-    "href=\"https://vituperative.github.io/i2pchat/\">https://"
-    "vituperative.github.io/i2pchat/</a></div></div></div></div></body></html>";
+    "href=\"https://github.com/zoonderkins/i2p-chat\">https://"
+    "github.com/zoonderkins/i2p-chat</a></div></div></div></div></body></html>";
 }; // namespace Protocol_Info
 
 namespace PROTOCOL_TAGS {

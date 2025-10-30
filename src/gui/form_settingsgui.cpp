@@ -285,6 +285,7 @@ void form_settingsgui::loadSettings() {
   }
 
   txt_Interests->setPlainText(settings->value("Interests", "").toString());
+  txt_ProfileWebURL->setText(settings->value("ProfileWebURL", "").toString());
 
   QPixmap tmpPixmap;
   avatarImageByteArray = settings->value("AvatarBinaryImage", "").toByteArray();
@@ -305,7 +306,7 @@ void form_settingsgui::loadSettings() {
   QColor color;
 
   font.fromString(settings->value("DefaultFont", "SansSerif,10").toString());
-  color.setNamedColor(settings->value("DefaultColor", "#000000").toString());
+  color = QColor::fromString(settings->value("DefaultColor", "#000000").toString());
 
   txtShowCurrentChatStyle->setFont(font);
   txtShowCurrentChatStyle->setTextColor(color);
@@ -322,7 +323,7 @@ void form_settingsgui::loadSettings() {
 
     font.fromString(
         settings->value("FontForOverwrite", "SansSerif,10").toString());
-    color.setNamedColor(
+    color = QColor::fromString(
         settings->value("ColorForOverwrite", "#000000").toString());
 
     txtOverrideRemote->setFont(font);
@@ -488,6 +489,7 @@ void form_settingsgui::saveSettings() {
     settings->setValue("Gender", "");
   }
   settings->setValue("Interests", txt_Interests->toPlainText());
+  settings->setValue("ProfileWebURL", txt_ProfileWebURL->text());
   settings->setValue("AvatarBinaryImage", avatarImageByteArray);
   settings->endGroup();
 

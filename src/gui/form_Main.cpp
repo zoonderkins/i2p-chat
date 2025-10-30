@@ -20,6 +20,8 @@
 
 #include "form_Main.h"
 #include "UserManager.h"
+#include "Base.h"
+#include <QCryptographicHash>
 #include <QIcon>
 #include <QSystemTrayIcon>
 
@@ -240,49 +242,15 @@ void form_MainWindow::namingMe() {
 void form_MainWindow::closeApplication() {
   if (Core->getFileTransferManager()->checkActiveFileTransfer() == false) {
 
-    // Show Destination info before exit
-    QString myDestB32 = Core->getMyDestinationB32();
-    QString myDestFull = Core->getMyDestination();
-
-    // Check SAM and SOCKS5 connection status
-    bool samConnected = false;
-    bool socks5Enabled = false;
-    QString samHost, socks5Host;
-    int samPort, socks5Port;
-
-    checkSamConnectionStatus(samConnected, samHost, samPort);
-    checkSocks5Status(socks5Enabled, socks5Host, socks5Port);
-
-    QString infoText = tr("\nYour I2P Information:\n\n");
-
-    // Only show status page if SAM or SOCKS5 is connected
-    if ((samConnected || socks5Enabled) && !myDestB32.isEmpty()) {
-      infoText += tr("Status Page:\nhttp://") + myDestB32 + "\n\n";
-    }
-
-    if (!myDestFull.isEmpty()) {
-      infoText += tr("Full Destination:\n") + myDestFull + "\n\n";
-    } else {
-      infoText += tr("(Destination not available - not connected)\n\n");
-    }
-
-    infoText += tr("Do you want to quit I2PChat?");
-
+    // Simple exit confirmation without showing destination info
     QMessageBox *msgBox = new QMessageBox(this);
     QPixmap pixmap = QPixmap(":/icons/avatar.svg");
     msgBox->setWindowIcon(QIcon(pixmap));
     msgBox->setIcon(QMessageBox::Question);
-    msgBox->setInformativeText(infoText);
+    msgBox->setText(tr("Do you want to quit I2PChat?"));
     msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox->setDefaultButton(QMessageBox::Yes);
     msgBox->setWindowModality(Qt::WindowModal);
-
-    // Make the message box larger, enable text selection and word wrap
-    msgBox->setStyleSheet("QMessageBox { min-width: 600px; } "
-                         "QLabel { min-width: 580px; min-height: 200px; text-align: left; }");
-
-    // Enable text selection
-    msgBox->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
     int ret = msgBox->exec();
     if (ret == QMessageBox::No) {
@@ -933,35 +901,112 @@ void form_MainWindow::showMyDestination() {
   checkSamConnectionStatus(samConnected, samHost, samPort);
   checkSocks5Status(socks5Enabled, socks5Host, socks5Port);
 
-  QString infoText = tr("Your I2P Information:\n\n");
+  // Debug: print connection status
+  qDebug() << "=== I2P Destination Debug Info ===";
+  qDebug() << "B32 Address:" << myDestB32;
+  qDebug() << "SAM Connected:" << samConnected << "Host:" << samHost << "Port:" << samPort;
+  qDebug() << "SOCKS5 Enabled:" << socks5Enabled << "Host:" << socks5Host << "Port:" << socks5Port;
+  qDebug() << "Full Destination available:" << !myDestFull.isEmpty();
+  qDebug() << "====================================";
 
-  // Only show status page if SAM or SOCKS5 is connected
+  // Create HTML table format for better display
+  QString infoText = "<html><body style='margin: 10px;'>";
+  infoText += "<h3 style='margin-bottom: 10px;'>" + tr("Your I2P Information") + "</h3>";
+
+  // Connection status info
+  infoText += "<div style='background-color: #f0f0f0; padding: 5px; margin-bottom: 15px; border-radius: 4px;'>";
+  infoText += "<strong>" + tr("Connection Status") + ":</strong><br>";
+  infoText += "SAM: " + QString(samConnected ? "✓ Connected" : "✗ Not connected") + (samConnected ? " (" + samHost + ":" + QString::number(samPort) + ")" : "") + "<br>";
+  infoText += "SOCKS5: " + QString(socks5Enabled ? "✓ Enabled" : "✗ Disabled") + (socks5Enabled ? " (" + socks5Host + ":" + QString::number(socks5Port) + ")" : "");
+
+  // Generate and display Profile Web URL (B32 address) if connected
+  if (!Core->getMyDestination().isEmpty()) {
+    size_t buffersize = 2048;
+    uint8_t *outputbuffer = (uint8_t *)malloc(buffersize);
+    char *b32buffer = (char *)malloc(buffersize);
+    QByteArray sha256hash;
+    int outputcount = i2p::data::Base64ToByteStream(
+        Core->getMyDestination().toUtf8().constData(),
+        Core->getMyDestination().size(), outputbuffer, buffersize);
+    QByteArray qarraysha256hash = QByteArray((char *)outputbuffer, outputcount);
+    while (outputcount > qarraysha256hash.size()) {
+      qarraysha256hash.append((char)0);
+    }
+    sha256hash =
+        QCryptographicHash::hash(qarraysha256hash, QCryptographicHash::Sha256);
+    outputcount = i2p::data::ByteStreamToBase32(
+        (uint8_t *)sha256hash.data(), sha256hash.size(), b32buffer, 52);
+    b32buffer[52] = '\0';
+    QString strb32address = "http://" + QString(b32buffer) + ".b32.i2p";
+
+    infoText += "<br><br><strong>" + tr("Profile Web URL") + ":</strong><br>";
+    infoText += "<a href=\"" + strb32address + "\" style='color: #0066cc;'>" + strb32address + "</a>";
+
+    free(outputbuffer);
+    free(b32buffer);
+  }
+
+  infoText += "</div>";
+
+  infoText += "<table border='0' cellpadding='8' cellspacing='0' style='border-collapse: collapse; width: 100%;'>";
+  infoText += "<colgroup>";
+  infoText += "<col style='width: 120px; vertical-align: top;'>";
+  infoText += "<col style='vertical-align: top;'>";
+  infoText += "</colgroup>";
+
+  // Only show web info if SAM or SOCKS5 is connected
   if ((samConnected || socks5Enabled) && !myDestB32.isEmpty()) {
-    infoText += tr("Status Page:\nhttp://") + myDestB32 + "\n\n";
+    infoText += "<tr>";
+    infoText += "<td style='font-weight: bold; white-space: nowrap; padding: 4px 8px;'>" + tr("Status Page") + "</td>";
+    infoText += "<td style='padding: 4px 8px; word-wrap: break-word; overflow-wrap: anywhere;'>http://" + myDestB32 + "</td>";
+    infoText += "</tr>";
+    infoText += "<tr>";
+    infoText += "<td style='font-weight: bold; white-space: nowrap; padding: 4px 8px;'>" + tr("Web Profile URL") + "</td>";
+    infoText += "<td style='padding: 4px 8px; word-wrap: break-word; overflow-wrap: anywhere;'>";
+    infoText += "http://" + myDestB32 + "</td>";
+    infoText += "</tr>";
   }
 
   if (!myDestFull.isEmpty()) {
-    infoText += tr("Full Destination:\n") + myDestFull;
+    infoText += "<tr>";
+    infoText += "<td style='font-weight: bold; white-space: nowrap; padding: 4px 8px;'>" + tr("Full Destination") + "</td>";
+    infoText += "<td style='padding: 4px 8px; font-family: monospace; font-size: 8pt; word-wrap: break-word; overflow-wrap: anywhere;'>" + myDestFull + "</td>";
+    infoText += "</tr>";
   } else {
-    infoText += tr("Full Destination:\n(Not connected to I2P)");
+    infoText += "<tr>";
+    infoText += "<td style='font-weight: bold; white-space: nowrap; padding: 4px 8px;'>" + tr("Full Destination") + "</td>";
+    infoText += "<td style='padding: 4px 8px; color: #888;'>" + tr("(Not connected to I2P)") + "</td>";
+    infoText += "</tr>";
   }
 
+  infoText += "</table></body></html>";
+
   QMessageBox msgBox(this);
-  QPixmap pixmap = QPixmap(":/icons/avatar.svg");
-  msgBox.setWindowIcon(QIcon(pixmap));
-  msgBox.setIcon(QMessageBox::Information);
   msgBox.setWindowTitle(tr("My I2P Destination"));
 
-  // Use setInformativeText for better formatting and scrolling
+  // Use setInformativeText for better formatting and scrolling (no icon)
   msgBox.setInformativeText(infoText);
 
   msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Ok);
   msgBox.setWindowModality(Qt::NonModal);
 
-  // Make the message box larger, enable text selection and word wrap
-  msgBox.setStyleSheet("QMessageBox { min-width: 600px; } "
-                       "QLabel { min-width: 580px; min-height: 150px; text-align: left; }");
+  // Make the message box larger with proper layout
+  msgBox.setStyleSheet(
+    "QMessageBox { "
+    "  min-width: 700px; "
+    "  max-width: 900px; "
+    "} "
+    "QMessageBox QLabel { "
+    "  min-width: 680px; "
+    "  min-height: 150px; "
+    "  padding: 10px; "
+    "} "
+    "QMessageBox QPushButton { "
+    "  min-width: 80px; "
+    "  min-height: 30px; "
+    "}"
+  );
 
   // Enable text selection
   msgBox.setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);

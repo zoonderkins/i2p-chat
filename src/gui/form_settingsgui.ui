@@ -1801,6 +1801,63 @@ border-radius: 2px;
        </property>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="ProfileWebURL">
+      <property name="geometry">
+       <rect>
+        <x>4</x>
+        <y>278</y>
+        <width>380</width>
+        <height>76</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>380</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>380</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Profile Web URL</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget_profile">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>25</y>
+         <width>361</width>
+         <height>42</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="profileURLLayout">
+        <item>
+         <widget class="QLabel" name="label_profileURL">
+          <property name="text">
+           <string>Your profile web URL (optional):</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_ProfileWebURL">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string>http://example.com/profile</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
      <widget class="QWidget" name="layoutWidget5">
       <property name="geometry">
        <rect>
@@ -2580,6 +2637,27 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
       </widget>
+      <widget class="QLabel" name="label_WebProfileURL">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>80</y>
+         <width>356</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>600</weight>
+        </font>
+       </property>
+       <property name="text">
+        <string>Web Profile URL (Share this address):</string>
+       </property>
+      </widget>
       <widget class="QPlainTextEdit" name="b32address">
        <property name="enabled">
         <bool>true</bool>
@@ -2587,7 +2665,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>13</x>
-         <y>88</y>
+         <y>95</y>
          <width>356</width>
          <height>48</height>
         </rect>
